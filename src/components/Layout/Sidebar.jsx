@@ -1,5 +1,5 @@
 import React from "react";
-import { Zap, LayoutDasboard,Barchart3,Users} from "lucide-react";
+import { Zap, LayoutDasboard,Barchart3,Users,ShoppingBag} from "lucide-react";
 
 
 
@@ -30,6 +30,17 @@ const menuItems = [
       { id: "all-users", label: "All Users" },
       { id: "activity", label: "User Activity" },
       { id: "roles", label: "Roles & Permissions" },
+    ],
+  },
+  {
+    id : "ecommerce",
+    icon : ShoppingBag,
+    label : "E-commerce",
+    submenu : [
+      
+      {id : "products", label : "Products"},
+      {id : "orders", label : "Orders"},
+      {id : "customers", label : "Customers"},
     ],
   }
 ];
