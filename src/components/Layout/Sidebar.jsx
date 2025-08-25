@@ -1,19 +1,30 @@
-import React from "react";
-import { Zap, LayoutDasboard,Barchart3,Users,ShoppingBag} from "lucide-react";
-
-
+import React, { useState } from "react";
+import { 
+  Zap,
+  LayoutDashboard,
+  BarChart3,
+  Users,
+  ShoppingBag,
+  Package,
+  CreditCard,
+  Calendar,
+  Settings,
+  FileText,
+  ChevronDown,
+  MessageSquare,
+} from "lucide-react";
 
 const menuItems = [
   {
     id : "dashboard",
-    icon : LayoutDasboard,
+    icon : LayoutDashboard,
     label : "Dashboard",
     active : true,
     badge : "New"
   },
   {
     id: "analytics",
-    icon: Barchart3,
+    icon: BarChart3,
     label: "Analytics",
     submenu: [
       { id: "overview", label: "Overview" },  
@@ -28,8 +39,8 @@ const menuItems = [
     count : "2.4k",
     submenu: [
       { id: "all-users", label: "All Users" },
-      { id: "activity", label: "User Activity" },
       { id: "roles", label: "Roles & Permissions" },
+      { id: "activity", label: "User Activity" },
     ],
   },
   {
@@ -37,44 +48,140 @@ const menuItems = [
     icon : ShoppingBag,
     label : "E-commerce",
     submenu : [
-      
       {id : "products", label : "Products"},
       {id : "orders", label : "Orders"},
       {id : "customers", label : "Customers"},
     ],
-  }
+  },
+  {
+    id : "inventory",
+    icon : Package,
+    label : "Inventory",
+    count : "847",
+  },
+  {
+    id : "transactions",
+    icon : CreditCard,
+    label : "Transactions",
+  },
+  {
+    id : "messages",
+    icon : MessageSquare,
+    label : "Messages",
+    badge : "12"
+  },
+  {
+    id : "calendar",
+    label : "Calendar",
+    icon : Calendar,
+  },
+  {
+    id : "reports",
+    icon : FileText,
+    label : "Reports",
+  },
+  {
+    id : "settings",
+    icon : Settings,
+    label : "Settings",
+  },
 ];
 
-const Sidebar = () => {
-  return (
-    <div className="transition duration-300 ease-in-out                                dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col relative z-10 ">
-      {/* Logo */}
-      <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-            <Zap className="w-6 h-6 text-white" />
-          </div>
+const Sidebar = ({collapsed, onToggle, currentPage, onPageChange}) => {
+  const [expandedItems, setExpandedItems] = useState(new Set(["analytics"]));
 
-          <div>
-            <h1 className="text-xl font-bold text-slate-800 dark:text-white ">
-              Nexus
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 ">
-              Admin Panel
-            </p>
-          </div>
+  const toggleExpanded = (itemId) => {
+    const newExpanded = new Set(expandedItems);
+    if (newExpanded.has(itemId)) {
+      newExpanded.delete(itemId);
+    } else {
+      newExpanded.add(itemId);
+    }
+    setExpandedItems(newExpanded);
+  };
+
+  return (
+    <div className={`${collapsed ? "w-20" : "w-72"} transition-all duration-300 ease-in-out dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col relative z-10`}>
+      
+      {/* Logo */}
+      <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50 flex items-center space-x-3">
+        <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+          <Zap className="w-6 h-6 text-white" />
         </div>
+        {!collapsed && (
+          <div>
+            <h1 className="text-xl font-bold text-slate-800 dark:text-white">Nexus</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Admin Panel</p>
+          </div>
+        )}
       </div>
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto"> </nav>
-      <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50">
-        <div className="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 ">
-          <img
-            src="https://static.vecteezy.com/system/resources/thumbnails/000/439/863/small_2x/Basic_Ui__28186_29.jpg"
-            alt="user"
-            className="w-10 h-10 rounded-full ring-2 ring-blue-500 "
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex-1 mn-w-0">
+
+      {/* Menu */}
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto"> 
+        {menuItems.map((item)=> {
+          const isActive = currentPage === item.id || item.active;
+          const isExpanded = expandedItems.has(item.id);
+
+          return (
+            <div key={item.id}>
+              <button 
+                onClick={() => item.submenu ? toggleExpanded(item.id) : onPageChange(item.id)}
+                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 
+                ${isActive 
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25" 
+                  : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <item.icon className="w-5 h-5"/>
+                  {!collapsed && <span className="font-medium">{item.label}</span>}
+                  {(item.badge && !collapsed) && (
+                    <span className="px-2 py-1 text-xs bg-red-500 text-white rounded-full">{item.badge}</span>
+                  )}
+                  {(item.count && !collapsed) && (
+                    <span className="px-2 py-1 text-xs bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full">{item.count}</span>
+                  )}
+                </div>
+                {!collapsed && item.submenu && (
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                )}
+              </button>
+
+              {/* Submenu */}
+              {!collapsed && item.submenu && (
+                <div className={`ml-8 overflow-hidden transition-[max-height] duration-300 ease-in-out ${isExpanded ? "max-h-40" : "max-h-0"}`}>
+                  <div className="mt-2 space-y-1">
+                    {item.submenu.map((subitem) => (
+                      <button 
+                        key={subitem.id}
+                        onClick={() => onPageChange(subitem.id)}
+                        className={`block w-full text-left px-2 py-1 rounded-lg text-sm transition 
+                          ${currentPage === subitem.id 
+                            ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300" 
+                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          }`}
+                      >
+                        {subitem.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </nav>
+
+      {/* User */}
+      {!collapsed && (
+        <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+            <img
+              src="https://static.vecteezy.com/system/resources/thumbnails/000/439/863/small_2x/Basic_Ui__28186_29.jpg"
+              alt="user"
+              className="w-10 h-10 rounded-full ring-2 ring-blue-500"
+            />
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
                 Salavat Karachurin
               </p>
@@ -84,7 +191,7 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
